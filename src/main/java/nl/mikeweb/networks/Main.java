@@ -18,7 +18,22 @@ public class Main {
 
 
         //DemoAllInFx.main(args);
+
+        Matrix A = new Matrix(10, 10);
+        A.addAdjacencyEdge(0,1);
+        A.addAdjacencyEdge(0,2);
+        A.addAdjacencyEdge(0,3);
+        A.addAdjacencyEdge(0,4);
+
+        //A.addAdjacencyEdge(4, 9);
+        //A.addAdjacencyEdge(9,2);
+        //A.addAdjacencyEdge(4,2);
+
+
+        DisplayAdjacencyMatrix.showGraph(A);
+
         System.out.println("Done");
+        System.exit(0);
     }
 
 

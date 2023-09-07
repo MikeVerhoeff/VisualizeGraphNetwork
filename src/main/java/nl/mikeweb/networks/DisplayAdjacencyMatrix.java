@@ -20,26 +20,51 @@ public class DisplayAdjacencyMatrix extends Application {
                     "}";
 
 
-    Graph graph;
+    Parent parent;
 
     public static void main(String args[]) {
         Application.launch(DemoAllInFx.class, args);
     }
 
-    public void showGraph(Matrix a) {
-        Parent p = createGraph(a);
+    public static void showGraph(Matrix a) {
         Platform.startup(() -> {
+            System.out.println("starting javafx");
+        });
+
+        DisplayAdjacencyMatrix application = new DisplayAdjacencyMatrix();
+        Parent p = createGraph(a);
+        application.parent = p;
+
+        Platform.runLater(()->{
             // create primary stage
             Stage stage = new Stage();
-
-            Scene scene = new Scene(p, 800, 600);
-            stage.setScene(scene);
-
-            stage.show();
+            stage.setOnCloseRequest((e)->{
+                synchronized (application.parent) {
+                    application.parent.notifyAll();
+                }
+            });
+            try {
+                application.init();
+                application.start(stage);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         });
+        try {
+            synchronized (application.parent) {
+                application.parent.wait();
+                application.stop();
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
     }
 
-    public Parent createGraph(Matrix a) {
+    public static Parent createGraph(Matrix a) {
         assert a.width() == a.height();
         assert a.equals(a.transpose());
         Graph graph = new MultiGraph("mg");
@@ -66,7 +91,7 @@ public class DisplayAdjacencyMatrix extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Graph graph  = new MultiGraph("mg");
+        /*Graph graph  = new MultiGraph("mg");
 
         FxViewer viewer = new FxViewer(graph, FxViewer.ThreadingModel.GRAPH_IN_GUI_THREAD);
 
@@ -92,6 +117,13 @@ public class DisplayAdjacencyMatrix extends Application {
         Scene scene = new Scene(v, 800, 600);
         primaryStage.setScene(scene);
 
+        primaryStage.show();
+
+         */
+
+        // create primary stage
+        Scene scene = new Scene(parent, 800, 600);
+        primaryStage.setScene(scene);
         primaryStage.show();
     }
 }
