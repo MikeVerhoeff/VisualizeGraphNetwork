@@ -1,6 +1,7 @@
 package nl.mikeweb.networks;
 
 import java.util.Arrays;
+import java.util.function.BiFunction;
 
 public class Matrix {
     float[][] data;
@@ -65,16 +66,26 @@ public class Matrix {
         data = newdata;
     }
 
-    public void fill(float v) {
+    public Matrix fill(float v) {
         for(int i=0; i<data.length; i++) {
             for (int j = 0; j < data[0].length; j++) {
                 data[i][j] = v;
             }
         }
+        return this;
+    }
+
+    public Matrix fill(BiFunction<Integer, Integer, Float> f) {
+        for(int i=0; i<data.length; i++) {
+            for (int j = 0; j < data[0].length; j++) {
+                data[i][j] = f.apply(i, j);
+            }
+        }
+        return this;
     }
 
     public float index(int i, int j) {
-        return data[j][i];
+        return data[i][j];
     }
 
     // graph edges
@@ -174,6 +185,25 @@ public class Matrix {
             }
         }
         return c;
+    }
+
+    public Matrix pow(int e) {
+        assert this.width()==this.height();
+        assert e>0;
+        if(e==0) {
+            return Matrix.identity(this.width());
+        }
+        else if(e==1) {
+            return this;
+        }
+        else if(e%2==0) {
+            Matrix m = this.pow(e/2);
+            return m.mult(m);
+        }
+        else {
+            Matrix m = this.pow(e/2);
+            return m.mult(m).mult(this);
+        }
     }
 
     // to string
