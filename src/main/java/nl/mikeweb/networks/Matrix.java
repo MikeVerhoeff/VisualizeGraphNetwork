@@ -1,5 +1,7 @@
 package nl.mikeweb.networks;
 
+import java.util.Arrays;
+
 public class Matrix {
     float[][] data;
 
@@ -34,6 +36,12 @@ public class Matrix {
         return m;
     }
 
+    public static Matrix u(int d) {
+        Matrix m = Matrix.Vector(d);
+        m.fill(1.0f);
+        return m;
+    }
+
     // add and remove columns
 
     public int addColumn() {
@@ -55,6 +63,18 @@ public class Matrix {
             }
         }
         data = newdata;
+    }
+
+    public void fill(float v) {
+        for(int i=0; i<data.length; i++) {
+            for (int j = 0; j < data[0].length; j++) {
+                data[i][j] = v;
+            }
+        }
+    }
+
+    public float index(int i, int j) {
+        return data[j][i];
     }
 
     // graph edges
@@ -169,5 +189,18 @@ public class Matrix {
             result += "]\n";
         }
         return result+"]";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Matrix matrix = (Matrix) o;
+        return Arrays.equals(data, matrix.data);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(data);
     }
 }

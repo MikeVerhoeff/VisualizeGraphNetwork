@@ -1,6 +1,8 @@
 package nl.mikeweb.networks;
 
 import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.graphstream.graph.Graph;
@@ -18,8 +20,48 @@ public class DisplayAdjacencyMatrix extends Application {
                     "}";
 
 
+    Graph graph;
+
     public static void main(String args[]) {
         Application.launch(DemoAllInFx.class, args);
+    }
+
+    public void showGraph(Matrix a) {
+        Parent p = createGraph(a);
+        Platform.startup(() -> {
+            // create primary stage
+            Stage stage = new Stage();
+
+            Scene scene = new Scene(p, 800, 600);
+            stage.setScene(scene);
+
+            stage.show();
+        });
+    }
+
+    public Parent createGraph(Matrix a) {
+        assert a.width() == a.height();
+        assert a.equals(a.transpose());
+        Graph graph = new MultiGraph("mg");
+
+        for(int i=0; i<a.width(); i++) {
+            graph.addNode(""+i);
+        }
+
+        for(int i=0; i<a.width(); i++) {
+            for(int j=0; j<i; j++) {
+                if(a.index(i, j)==1.0f) {
+                    graph.addEdge(i+"-"+j, ""+i, ""+j);
+                }
+            }
+        }
+
+        FxViewer viewer = new FxViewer(graph, FxViewer.ThreadingModel.GRAPH_IN_GUI_THREAD);
+        SpringBox layout = new SpringBox(false,new Random(0));
+        viewer.enableAutoLayout(layout);
+        FxViewPanel v =  (FxViewPanel) viewer.addDefaultView( false ) ;
+        
+        return v;
     }
 
     @Override
